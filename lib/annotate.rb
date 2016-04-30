@@ -33,7 +33,7 @@ module Annotate
   ].freeze
   OTHER_OPTIONS = [
     :ignore_columns, :skip_on_db_migrate, :wrapper_open, :wrapper_close, :wrapper, :routes,
-    :hide_limit_column_types, :ignore_routes, :active_admin
+    :hide_limit_column_types, :ignore_routes, :active_admin, :types
   ].freeze
   PATH_OPTIONS = [
     :require, :model_dir, :root_dir
@@ -85,6 +85,8 @@ module Annotate
     options[:wrapper_open] ||= options[:wrapper]
     options[:wrapper_close] ||= options[:wrapper]
 
+    options[:types] ||= %w(model test fixture factory serializer scaffold controller helper)
+
     # These were added in 2.7.0 but so this is to revert to old behavior by default
     options[:exclude_scaffolds] = Annotate.true?(ENV.fetch('exclude_scaffolds', 'true'))
     options[:exclude_controllers] = Annotate.true?(ENV.fetch('exclude_controllers', 'true'))
@@ -104,7 +106,7 @@ module Annotate
   end
 
   def self.include_routes?
-    ENV['routes'] =~ TRUE_RE
+    ENV['routes'] =~ TRUE_RE || ENV.fetch('types', '').split(',').include?('route')
   end
 
   def self.include_models?

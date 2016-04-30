@@ -10,7 +10,7 @@ module AnnotateModels
   PREFIX_MD        = "## Schema Information"
   END_MARK         = "== Schema Information End"
 
-  MATCHED_TYPES = %w(test fixture factory serializer scaffold controller helper)
+  MATCHED_TYPES = %w(test fixture factory serializer scaffold controller helper admin)
 
   # File.join for windows reverse bar compat?
   # I dont use windows, can`t test
@@ -429,7 +429,8 @@ module AnnotateModels
     end
 
     def matched_types(options)
-      types = MATCHED_TYPES
+      types = MATCHED_TYPES.select { |type| options[:types].include?(type) }
+
       types << 'admin' if options[:active_admin] =~ TRUE_RE && !types.include?('admin')
 
       types
@@ -446,6 +447,7 @@ module AnnotateModels
     #  :position_in_fixture<Symbol>:: where to place the annotated section in fixture file
     #  :position_in_factory<Symbol>:: where to place the annotated section in factory file
     #  :position_in_serializer<Symbol>:: where to place the annotated section in serializer file
+    #  :types<Array>:: array of types that should be annotated
     #  :exclude_tests<Symbol>:: whether to skip modification of test/spec files
     #  :exclude_fixtures<Symbol>:: whether to skip modification of fixture files
     #  :exclude_factories<Symbol>:: whether to skip modification of factory files
@@ -466,7 +468,7 @@ module AnnotateModels
         model_file_name = File.join(file)
         annotated = []
 
-        if annotate_one_file(model_file_name, info, :position_in_class, options_with_position(options, :position_in_class))
+        if options[:types].include?('model') && annotate_one_file(model_file_name, info, :position_in_class, options_with_position(options, :position_in_class))
           annotated << model_file_name
         end
 

@@ -13,6 +13,7 @@ if Rails.env.development?
       'position_in_fixture'     => 'before',
       'position_in_factory'     => 'before',
       'position_in_serializer'  => 'before',
+      'types'                   => %w(model test fixture factory serializer scaffold controller helper),
       'show_foreign_keys'       => 'true',
       'show_indexes'            => 'true',
       'simple_indexes'          => 'false',
