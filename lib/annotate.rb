@@ -25,11 +25,10 @@ module Annotate
     :position_in_serializer
   ].freeze
   FLAG_OPTIONS = [
-    :show_indexes, :simple_indexes, :include_version, :exclude_tests,
-    :exclude_fixtures, :exclude_factories, :ignore_model_sub_dir,
+    :show_indexes, :simple_indexes, :include_version,
+    :ignore_model_sub_dir, :ignore_unknown_models,
     :format_bare, :format_rdoc, :format_markdown, :sort, :force, :trace,
-    :timestamp, :exclude_serializers, :classified_sort, :show_foreign_keys,
-    :exclude_scaffolds, :exclude_controllers, :exclude_helpers, :ignore_unknown_models
+    :timestamp, :classified_sort, :show_foreign_keys
   ].freeze
   OTHER_OPTIONS = [
     :ignore_columns, :skip_on_db_migrate, :wrapper_open, :wrapper_close, :wrapper, :routes,
@@ -85,13 +84,7 @@ module Annotate
     options[:wrapper_open] ||= options[:wrapper]
     options[:wrapper_close] ||= options[:wrapper]
 
-    options[:types] ||= %w(model test fixture factory serializer scaffold controller helper)
-
-    # These were added in 2.7.0 but so this is to revert to old behavior by default
-    options[:exclude_scaffolds] = Annotate.true?(ENV.fetch('exclude_scaffolds', 'true'))
-    options[:exclude_controllers] = Annotate.true?(ENV.fetch('exclude_controllers', 'true'))
-    options[:exclude_helpers] = Annotate.true?(ENV.fetch('exclude_helpers', 'true'))
-
+    options[:types] ||= %w(model test fixture factory serializer)
     options
   end
 

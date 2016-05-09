@@ -310,14 +310,14 @@ module AnnotateModels
     end
 
     def hide_limit?(col_type, options)
-      excludes =
+      types_to_excludes =
         if options[:hide_limit_column_types].blank?
           NO_LIMIT_COL_TYPES
         else
           options[:hide_limit_column_types].split(',')
         end
 
-      excludes.include?(col_type)
+      types_to_excludes.include?(col_type)
     end
 
     def get_foreign_key_info(klass, options={})
@@ -448,13 +448,6 @@ module AnnotateModels
     #  :position_in_factory<Symbol>:: where to place the annotated section in factory file
     #  :position_in_serializer<Symbol>:: where to place the annotated section in serializer file
     #  :types<Array>:: array of types that should be annotated
-    #  :exclude_tests<Symbol>:: whether to skip modification of test/spec files
-    #  :exclude_fixtures<Symbol>:: whether to skip modification of fixture files
-    #  :exclude_factories<Symbol>:: whether to skip modification of factory files
-    #  :exclude_serializers<Symbol>:: whether to skip modification of serializer files
-    #  :exclude_scaffolds<Symbol>:: whether to skip modification of scaffold files
-    #  :exclude_controllers<Symbol>:: whether to skip modification of controller files
-    #  :exclude_helpers<Symbol>:: whether to skip modification of helper files
     #
     # == Returns:
     # an array of file names that were annotated.
@@ -473,24 +466,20 @@ module AnnotateModels
         end
 
         matched_types(options).each do |key|
-          exclusion_key = "exclude_#{key.pluralize}".to_sym
           position_key = "position_in_#{key}".to_sym
 
           # Same options for active_admin models
           if key == 'admin'
-            exclusion_key = 'exclude_class'.to_sym
             position_key = 'position_in_class'.to_sym
           end
 
-          unless options[exclusion_key]
-            self.get_patterns(key).
-              map { |f| resolve_filename(f, model_name, table_name) }.
-              each { |f|
-                if annotate_one_file(f, info, position_key, options_with_position(options, position_key))
-                  annotated << f
-                end
-              }
-          end
+          self.get_patterns(key).
+            map { |f| resolve_filename(f, model_name, table_name) }.
+            each { |f|
+              if annotate_one_file(f, info, position_key, options_with_position(options, position_key))
+                annotated << f
+              end
+            }
         end
       rescue Exception => e
         puts "Unable to annotate #{file}: #{e.message}"
