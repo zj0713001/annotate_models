@@ -232,8 +232,8 @@ module AnnotateModels
       bare_type_allowance = 16
 
       if options[:format_markdown]
-        info << sprintf( "# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n", 'Name', 'Type', 'Attributes' )
-        info << "# #{ '-' * ( max_size + md_names_overhead ) } | #{'-' * md_type_allowance} | #{ '-' * 27 }\n"
+        info << sprintf( "# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %-27.18s | %s\n", 'Name', 'Type', 'Attributes', 'Comments' )
+        info << "# #{ '-' * ( max_size + md_names_overhead ) } | #{'-' * md_type_allowance} | #{ '-' * 27 } | #{ '-' * 27 }\n"
       end
 
       cols = if ignore_columns = options[:ignore_columns]
@@ -297,9 +297,13 @@ module AnnotateModels
         if options[:format_rdoc]
           info << sprintf("# %-#{max_size}.#{max_size}s<tt>%s</tt>", "*#{col_name}*::", attrs.unshift(col_type).join(", ")).rstrip + "\n"
         elsif options[:format_markdown]
+          col_name = col.name
+          col_comment = with_comments?(klass, options) && col.comment || ""
+          col_attr = attrs.join(", ").rstrip
           name_remainder = max_size - col_name.length
           type_remainder = (md_type_allowance - 2) - col_type.length
-          info << (sprintf("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`", col_name, " ", col_type, " ", attrs.join(", ").rstrip)).gsub('``', '  ').rstrip + "\n"
+          attr_remainder = 27 - 2 - col_attr.length
+          info << (sprintf("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`%#{attr_remainder}s | `%s`", col_name, " ", col_type, " ", col_attr, " ", col_comment)).gsub('``', '  ').rstrip + "\n"
         else
           info << format_default(col_name, max_size, col_type, bare_type_allowance, attrs)
         end
