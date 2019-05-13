@@ -368,6 +368,8 @@ module AnnotateModels
     def get_col_type(col)
       if (col.respond_to?(:bigint?) && col.bigint?) || /\Abigint\b/ =~ col.sql_type
         'bigint'
+      elsif col.sql_type.match(/^timestamp$/i)
+        "timestamp"
       else
         (col.type || col.sql_type).to_s
       end
